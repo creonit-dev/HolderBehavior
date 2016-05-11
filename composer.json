@@ -1,0 +1,15 @@
+{
+  "name": "creonit/propel-holder-behavior",
+  "type": "propel-behavior",
+  "keywords": [
+    "creonit",
+    "symfony",
+    "propel",
+    "behavior"
+  ],
+  "extra": {
+    "name": "image",
+    "class": "Creonit\\PropelBehaviorBundle\\Holder\\HolderBehavior"
+  },
+  "license": "GNU GPLv3"
+}
