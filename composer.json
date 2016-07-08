@@ -9,7 +9,12 @@
   ],
   "extra": {
     "name": "holder",
-    "class": "Creonit\\PropelBehaviorBundle\\Holder\\HolderBehavior"
+    "class": "Creonit\\PropelHolderBehavior\\HolderBehavior"
   },
-  "license": "GNU GPLv3"
+  "license": "GNU GPLv3",
+  "autoload": {
+    "psr-4": {
+      "Creonit\\PropelHolderBehavior\\": ""
+    }
+  }
 }
