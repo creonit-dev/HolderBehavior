@@ -7,6 +7,10 @@ use Propel\Generator\Model\ForeignKey;
 
 class HolderBehavior extends Behavior
 {
+
+    protected $holderTable;
+    protected $holderTableName = 'holder';
+
     public function modifyTable()
     {
         
@@ -14,8 +18,9 @@ class HolderBehavior extends Behavior
 
         $tableColumnName = $table->getCommonName() . '_id';
 
-        $holderTable = $table->getDatabase()->getTable('holder');
+        $this->addHolderTable();
 
+        $holderTable = $table->getDatabase()->getTable($this->holderTableName);
         $holderTable->addColumn([
             'name' => $tableColumnName,
             'type' => 'integer'
@@ -32,4 +37,31 @@ class HolderBehavior extends Behavior
         $holderTable->addForeignKey($fk);
 
     }
+
+    protected function addHolderTable(){
+        if(null !== $this->holderTable){
+            return;
+        }
+
+        $database = $this->getTable()->getDatabase();
+        $tableName  = $this->holderTableName;
+
+        if ($database->hasTable($tableName)) {
+            $table = $this->holderTable = $database->getTable($tableName);
+
+        } else {
+            $table = $this->holderTable = $database->addTable(['name' => $tableName]);
+            $table->setPackage($database->getPackage());
+            $table->addColumn(['name' => 'id', 'type' => 'integer', 'primaryKey' => true, 'autoIncrement' => true]);
+        }
+
+        if(!$table->hasColumn('complete')){
+            $table->addColumn(['name' => 'complete', 'type' => 'boolean', 'required' => true, 'default' => 0]);
+        }
+
+        foreach ($database->getBehaviors() as $behavior) {
+            $behavior->modifyDatabase();
+        }
+    }
+
 }
