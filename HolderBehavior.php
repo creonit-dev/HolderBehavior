@@ -59,9 +59,16 @@ class HolderBehavior extends Behavior
             $table->addColumn(['name' => 'complete', 'type' => 'boolean', 'required' => true, 'default' => 0]);
         }
 
+        $table->addBehavior(new HolderModelBehavior());
+
         foreach ($database->getBehaviors() as $behavior) {
             $behavior->modifyDatabase();
         }
+    }
+
+    public function objectMethods($builder)
+    {
+        return $this->renderTemplate('objectMethods', ['table' => $this->getTable(), 'holderTable' => $this->holderTable]);
     }
 
 }
