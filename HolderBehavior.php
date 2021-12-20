@@ -7,13 +7,14 @@ use Propel\Generator\Model\ForeignKey;
 
 class HolderBehavior extends Behavior
 {
-
     protected $holderTable;
     protected $holderTableName = 'holder';
+    protected $parameters = [
+        'parameter' => null,
+    ];
 
     public function modifyTable()
     {
-        
         $table = $this->getTable();
 
         $tableColumnName = $table->getCommonName() . '_id';
@@ -26,8 +27,14 @@ class HolderBehavior extends Behavior
             'type' => 'integer'
         ]);
 
+        $fkName = $this->getParameter('parameter') ?: sprintf('fk_%s_%s_%s', ...[
+            $holderTable->getCommonName(),
+            $tableColumnName,
+            $table->getCommonName()
+        ]);
+
         $fk = new ForeignKey();
-        $fk->setName("fk_{$holderTable->getCommonName()}_{$tableColumnName}_{$table->getCommonName()}");
+        $fk->setName($fkName);
         $fk->setForeignTableCommonName($table->getCommonName());
         $fk->setForeignSchemaName($table->getSchema());
         $fk->setDefaultJoin('LEFT JOIN');
@@ -35,16 +42,16 @@ class HolderBehavior extends Behavior
         $fk->setOnUpdate(ForeignKey::CASCADE);
         $fk->addReference($tableColumnName, 'id');
         $holderTable->addForeignKey($fk);
-
     }
 
-    protected function addHolderTable(){
-        if(null !== $this->holderTable){
+    protected function addHolderTable()
+    {
+        if (null !== $this->holderTable) {
             return;
         }
 
         $database = $this->getTable()->getDatabase();
-        $tableName  = $this->holderTableName;
+        $tableName = $this->holderTableName;
 
         if ($database->hasTable($tableName)) {
             $table = $this->holderTable = $database->getTable($tableName);
@@ -52,11 +59,21 @@ class HolderBehavior extends Behavior
         } else {
             $table = $this->holderTable = $database->addTable(['name' => $tableName]);
             $table->setPackage($database->getPackage());
-            $table->addColumn(['name' => 'id', 'type' => 'integer', 'primaryKey' => true, 'autoIncrement' => true]);
+            $table->addColumn([
+                'name' => 'id',
+                'type' => 'integer',
+                'primaryKey' => true,
+                'autoIncrement' => true
+            ]);
         }
 
-        if(!$table->hasColumn('complete')){
-            $table->addColumn(['name' => 'complete', 'type' => 'boolean', 'required' => true, 'default' => 0]);
+        if (!$table->hasColumn('complete')) {
+            $table->addColumn([
+                'name' => 'complete',
+                'type' => 'boolean',
+                'required' => true,
+                'default' => 0
+            ]);
         }
 
         $table->addBehavior(new HolderModelBehavior());
@@ -68,7 +85,9 @@ class HolderBehavior extends Behavior
 
     public function objectMethods($builder)
     {
-        return $this->renderTemplate('objectMethods', ['table' => $this->getTable(), 'holderTable' => $this->holderTable]);
+        return $this->renderTemplate('objectMethods', [
+            'table' => $this->getTable(),
+            'holderTable' => $this->holderTable
+        ]);
     }
-
 }
